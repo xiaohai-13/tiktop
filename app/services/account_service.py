@@ -2,25 +2,37 @@
 import logging
 from app.agents.competitor_agent import CompetitorAgent
 from app.services.report_service import save_report
+from app.db.models import AnalysisRecord, get_session
 
 logger = logging.getLogger(__name__)
-
-_competitor_agent: CompetitorAgent | None = None
+_agent: CompetitorAgent | None = None
 
 
 def get_competitor_agent() -> CompetitorAgent:
-    global _competitor_agent
-    if _competitor_agent is None:
-        _competitor_agent = CompetitorAgent()
-    return _competitor_agent
+    global _agent
+    if _agent is None:
+        _agent = CompetitorAgent()
+    return _agent
 
 
 def analyze_account(username: str) -> dict:
-    """Analyze a TikTok account, auto-save report"""
     agent = get_competitor_agent()
     try:
         report = agent.analyze(username)
-        save_report(username, report, report_type="competitor")
+        meta = save_report(username, report, report_type="competitor")
+
+        # SQLite record
+        session = get_session()
+        record = AnalysisRecord(
+            username=username,
+            analysis_type="competitor",
+            report_path=f"data/reports/{meta['filename']}",
+            status="completed",
+        )
+        session.add(record)
+        session.commit()
+        session.close()
+
         return {"success": True, "username": username, "report": report}
     except Exception as e:
         logger.error(f"Analysis failed for @{username}: {e}")
