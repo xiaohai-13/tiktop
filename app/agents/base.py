@@ -6,12 +6,8 @@ from app.config import settings
 
 def create_deepseek_llm(temperature: float = 0.7, reasoning_effort: str | None = None) -> ChatDeepSeek:
     if not settings.deepseek_configured:
-        raise RuntimeError("DeepSeek API Key not configured. Set DEEPSEEK_API_KEY in .env")
-
+        raise RuntimeError("DeepSeek API Key not configured")
     effort = reasoning_effort or settings.REASONING_EFFORT
-
-    # reasoning_effort is a first-class param in ChatOpenAI / ChatDeepSeek
-    # extra_body goes via default_params for the HTTP request
     llm = ChatDeepSeek(
         model=settings.DEEPSEEK_MODEL,
         api_key=settings.DEEPSEEK_API_KEY,
@@ -20,15 +16,12 @@ def create_deepseek_llm(temperature: float = 0.7, reasoning_effort: str | None =
         max_tokens=8192,
         reasoning_effort=effort,
     )
-
-    # Inject thinking:enabled via the underlying client's default request params
     if settings.THINKING_ENABLED and hasattr(llm, "client"):
         try:
             llm.client.default_params = getattr(llm.client, "default_params", {}) or {}
             llm.client.default_params["extra_body"] = {"thinking": {"type": "enabled"}}
         except Exception:
             pass
-
     return llm
 
 
@@ -41,12 +34,20 @@ class TikTokAgent:
         self.tools = tools or []
 
     def build_agent(self):
-        return create_react_agent(model=self.llm, tools=self.tools, checkpointer=self.memory, prompt=self.system_prompt)
+        return create_react_agent(
+            model=self.llm,
+            tools=self.tools,
+            checkpointer=self.memory,
+            state_modifier=self.system_prompt,
+        )
 
     def run(self, user_input: str, thread_id: str = "default") -> str:
         agent = self.build_agent()
         config = {"configurable": {"thread_id": thread_id}}
-        result = agent.invoke({"messages": [{"role": "user", "content": user_input}]}, config=config)
+        result = agent.invoke(
+            {"messages": [{"role": "user", "content": user_input}]},
+            config=config,
+        )
         messages = result.get("messages", [])
         for msg in reversed(messages):
             if hasattr(msg, "content") and getattr(msg, "type", "") == "ai":

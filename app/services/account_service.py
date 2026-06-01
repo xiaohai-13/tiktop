@@ -1,6 +1,4 @@
-﻿# ============================================================
-# 账号分析服务层
-# ============================================================
+"""Account analysis service layer"""
 import logging
 from app.agents.competitor_agent import CompetitorAgent
 from app.services.report_service import save_report
@@ -18,23 +16,12 @@ def get_competitor_agent() -> CompetitorAgent:
 
 
 def analyze_account(username: str) -> dict:
-    """分析单个 TikTok 账号，自动保存报告"""
+    """Analyze a TikTok account, auto-save report"""
     agent = get_competitor_agent()
     try:
         report = agent.analyze(username)
-
-        # 自动保存报告
         save_report(username, report, report_type="competitor")
-
-        return {
-            "success": True,
-            "username": username,
-            "report": report,
-        }
+        return {"success": True, "username": username, "report": report}
     except Exception as e:
-        logger.error(f"分析 @{username} 失败: {e}")
-        return {
-            "success": False,
-            "username": username,
-            "error": str(e),
-        }
+        logger.error(f"Analysis failed for @{username}: {e}")
+        return {"success": False, "username": username, "error": str(e)}

@@ -1,53 +1,54 @@
-# ============================================================
-# 竞品分析 Agent — 集成数据采集 + DeepSeek 分析
-# ============================================================
+"""Competitor Analysis Agent - TikTok account deep analysis"""
 import logging
 from app.agents.base import TikTokAgent
 from app.tools.tiktok_scraper import tiktok_scrape_profile
 
 logger = logging.getLogger(__name__)
 
-COMPETITOR_SYSTEM_PROMPT = """你是 TikTok 竞品分析专家。
-用户会提供 TikTok 账号的用户名，你需要先用 tiktok_scrape_profile 工具采集数据，然后进行深度分析。
+COMPETITOR_SYSTEM_PROMPT = """You are a TikTok competitive analysis expert.
+Your job: analyze TikTok accounts using data collected by the tiktok_scrape_profile tool.
 
-## 工作流程
-1. 调用 tiktok_scrape_profile(username) 获取账号数据
-2. 分析数据，从以下维度输出报告：
+## Workflow
+1. Call tiktok_scrape_profile(username) to get account data (followers, bio, recent videos)
+2. Analyze the data deeply and produce a structured report
 
-## 分析维度
-- **账号概况**：定位、人设、目标受众
-- **数据表现**：粉丝量级、互动率、增长趋势
-- **内容策略**：视频类型分布、爆款特征、发布节奏
-- **竞争优劣势**：差异化亮点、可改进点
-- **运营建议**：可落地的 3-5 条具体建议
+## Analysis Dimensions
+- **Account Overview**: positioning, persona, target audience, niche
+- **Data Performance**: follower scale, engagement rate, growth trajectory
+- **Content Strategy**: video types, viral content patterns, posting cadence
+- **Competitive Position**: strengths, weaknesses, differentiation opportunities
+- **Actionable Recommendations**: 3-5 specific, data-backed suggestions
 
-## 输出格式
-请以结构化 Markdown 输出分析报告，使用表格和分点。
+## Output Format
+Output a well-structured Markdown report with:
+1. Executive Summary (3-4 sentences)
+2. Account Profile table
+3. Content Analysis with patterns identified
+4. Competitive Assessment
+5. Recommended Actions (numbered list)
+
+Be specific, data-driven, and actionable. Use Chinese for the report content.
 """
 
 
 class CompetitorAgent(TikTokAgent):
-    """竞品分析 Agent — 采集数据 + AI 分析"""
+    """Competitor analysis agent with data scraping + AI analysis"""
 
-    def __init__(self):
+    def __init__(self, reasoning_effort: str = "high"):
         super().__init__(
             name="CompetitorAnalyzer",
             system_prompt=COMPETITOR_SYSTEM_PROMPT,
             tools=[tiktok_scrape_profile],
+            reasoning_effort=reasoning_effort,
         )
 
     def analyze(self, username: str, thread_id: str | None = None) -> str:
-        """
-        分析单个 TikTok 账号
-
-        Args:
-            username: TikTok 用户名（不带 @）
-            thread_id: 会话 ID，用于记忆上下文
-
-        Returns:
-            Markdown 格式的分析报告
-        """
-        prompt = f"请分析 TikTok 账号 @{username}，先采集数据，然后给出完整分析报告。"
+        """Analyze a TikTok account and return a Markdown report"""
+        prompt = (
+            f"Please analyze TikTok account @{username}. "
+            f"First use tiktok_scrape_profile to collect data, "
+            f"then produce a comprehensive analysis report in Chinese."
+        )
         thread = thread_id or f"competitor_{username}"
-        logger.info(f"开始分析 @{username} (thread={thread})")
+        logger.info(f"Starting analysis: @{username}")
         return self.run(prompt, thread_id=thread)

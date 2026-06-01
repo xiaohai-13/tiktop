@@ -1,4 +1,18 @@
-# TikTok Data Scraper with Mock Data Support
+﻿"""Rewrite core module files with proper encoding"""
+import os
+ROOT = r"E:\agent-project\tiktop"
+
+def write(relpath, content):
+    full = os.path.join(ROOT, relpath)
+    os.makedirs(os.path.dirname(full), exist_ok=True)
+    with open(full, "w", encoding="utf-8") as f:
+        f.write(content)
+    print(f"  OK: {relpath}")
+
+# ============================================================
+# tiktok_scraper.py
+# ============================================================
+SCRAPER = """# TikTok Data Scraper with Mock Data Support
 import json, logging, random
 from dataclasses import dataclass, field, asdict
 from typing import Optional
@@ -136,7 +150,6 @@ def generate_mock_data(username: str) -> TikTokAnalysisData:
 
 @tool
 def tiktok_scrape_profile(username: str) -> str:
-    """Collect TikTok account public data including followers, bio, and recent videos. Parameter username: TikTok username without @ sign."""
     logger.info(f"Scraping profile: @{username}")
     data = generate_mock_data(username)
     if data.error:
@@ -146,3 +159,8 @@ def tiktok_scrape_profile(username: str) -> str:
         "recent_videos": [asdict(v) for v in data.recent_videos],
         "source": data.source,
     }, ensure_ascii=False)
+"""
+
+write("app/tools/tiktok_scraper.py", SCRAPER)
+
+print("All files rewritten successfully!")
