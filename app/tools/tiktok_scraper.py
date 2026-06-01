@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 # TikTok 数据采集工具 — 基于 Playwright
 # ============================================================
 import json
@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class TikTokProfile:
-    \"\"\"TikTok 账号资料\"\"\"
+    """TikTok 账号资料"""
     username: str = ""
     nickname: str = ""
     bio: str = ""
@@ -32,7 +32,7 @@ class TikTokProfile:
 
 @dataclass
 class TikTokVideo:
-    \"\"\"单条视频信息\"\"\"
+    """单条视频信息"""
     video_id: str = ""
     description: str = ""
     views: int = 0
@@ -44,7 +44,7 @@ class TikTokVideo:
 
 @dataclass
 class TikTokAnalysisData:
-    \"\"\"采集结果\"\"\"
+    """采集结果"""
     profile: TikTokProfile = field(default_factory=TikTokProfile)
     recent_videos: list[TikTokVideo] = field(default_factory=list)
     error: Optional[str] = None
@@ -54,7 +54,7 @@ class TikTokAnalysisData:
 # ============================================================
 
 def _parse_count(text: str) -> int:
-    \"\"\"解析 TikTok 的计数格式: '1.2M' → 1200000, '45.6K' → 45600\"\"\"
+    """解析 TikTok 的计数格式: '1.2M' → 1200000, '45.6K' → 45600"""
     if not text:
         return 0
     text = text.strip().replace(",", "")
@@ -72,7 +72,7 @@ def _parse_count(text: str) -> int:
 
 
 class TikTokScraper:
-    \"\"\"TikTok 数据采集器\"\"\"
+    """TikTok 数据采集器"""
 
     BASE_URL = "https://www.tiktok.com"
 
@@ -82,7 +82,7 @@ class TikTokScraper:
         self.browser = None
 
     def _launch(self):
-        \"\"\"启动浏览器\"\"\"
+        """启动浏览器"""
         self.playwright = sync_playwright().start()
         self.browser = self.playwright.chromium.launch(
             headless=self.headless,
@@ -93,14 +93,14 @@ class TikTokScraper:
         )
 
     def _close(self):
-        \"\"\"关闭浏览器\"\"\"
+        """关闭浏览器"""
         if self.browser:
             self.browser.close()
         if self.playwright:
             self.playwright.stop()
 
     def _new_page(self) -> Page:
-        \"\"\"创建新页面，设置反检测\"\"\"
+        """创建新页面，设置反检测"""
         context = self.browser.new_context(
             user_agent=(
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -118,7 +118,7 @@ class TikTokScraper:
         return page
 
     def scrape_profile(self, username: str, max_videos: int = 10) -> TikTokAnalysisData:
-        \"\"\"采集单个账号的公开数据\"\"\"
+        """采集单个账号的公开数据"""
         result = TikTokAnalysisData()
         profile_url = f"{self.BASE_URL}/@{username}"
 
@@ -152,7 +152,7 @@ class TikTokScraper:
         return result
 
     def _extract_profile(self, page: Page, profile: TikTokProfile):
-        \"\"\"提取账号资料\"\"\"
+        """提取账号资料"""
         try:
             # 等待用户信息区域加载
             page.wait_for_selector('[data-e2e="user-title"]', timeout=10000)
@@ -194,7 +194,7 @@ class TikTokScraper:
             logger.warning(f"提取资料时出错: {e}")
 
     def _extract_videos(self, page: Page, max_count: int) -> list[TikTokVideo]:
-        \"\"\"提取最近视频列表\"\"\"
+        """提取最近视频列表"""
         videos = []
         try:
             # TikTok 视频卡片
@@ -236,11 +236,11 @@ class TikTokScraper:
 
 @tool
 def tiktok_scrape_profile(username: str) -> str:
-    \"\"\"
+    """
     采集 TikTok 账号的公开数据，包括粉丝数、简介、近期视频等。
     参数 username: TikTok 用户名（不带 @，如 tiktok）
     返回 JSON 格式的分析数据
-    \"\"\"
+    """
     scraper = TikTokScraper(headless=True)
     data = scraper.scrape_profile(username)
 
@@ -273,3 +273,4 @@ if __name__ == "__main__":
         "recent_videos": [asdict(v) for v in result.recent_videos],
         "error": result.error,
     }, ensure_ascii=False, indent=2))
+

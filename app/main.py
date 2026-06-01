@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 # FastAPI 主入口
 # ============================================================
 import logging
@@ -27,7 +27,10 @@ app.add_middleware(
 
 # 注册路由
 from app.api.analysis import router as analysis_router
+from app.api.webhook import router as webhook_router
+
 app.include_router(analysis_router)
+app.include_router(webhook_router)
 
 
 @app.get("/api/health")

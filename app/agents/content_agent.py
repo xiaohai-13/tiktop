@@ -1,4 +1,4 @@
-﻿from app.agents.base import TikTokAgent
+from app.agents.base import TikTokAgent
 
 CONTENT_SYSTEM_PROMPT = """你是 TikTok 内容策略专家。
 根据竞品分析和目标赛道，为用户生成内容策略建议。

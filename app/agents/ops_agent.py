@@ -1,4 +1,4 @@
-﻿from app.agents.base import TikTokAgent
+from app.agents.base import TikTokAgent
 
 OPS_SYSTEM_PROMPT = """你是 TikTok 运营优化专家。
 基于账号数据给出可落地的运营优化建议。

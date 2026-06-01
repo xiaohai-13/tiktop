@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 # Streamlit Dashboard — TikTok AI 运营系统
 # ============================================================
 import streamlit as st
@@ -15,7 +15,7 @@ API_BASE = "http://localhost:8000/api"
 
 
 def call_api(endpoint: str, method: str = "GET", json_data: dict | None = None):
-    \"\"\"调用后端 API\"\"\"
+    """调用后端 API"""
     try:
         client = httpx.Client(timeout=60.0)
         if method == "POST":
@@ -146,3 +146,4 @@ elif page == "⚙️ 设置":
     if st.button("💾 保存配置", type="primary"):
         st.info("配置请直接编辑项目根目录的 .env 文件")
         st.code(open(".env.example", encoding="utf-8").read(), language="bash")
+
