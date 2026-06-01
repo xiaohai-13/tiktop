@@ -1,5 +1,5 @@
 # ============================================================
-# FastAPI 主入口
+# FastAPI ???
 # ============================================================
 import logging
 from fastapi import FastAPI
@@ -12,8 +12,8 @@ logging.basicConfig(
 )
 
 app = FastAPI(
-    title="TikTok AI 智能运营系统",
-    description="基于 DeepSeek 的 TikTok 竞品分析 & 内容策略引擎",
+    title="TikTok AI ??????",
+    description="?? DeepSeek ? TikTok ???? & ??????",
     version="0.1.0",
 )
 
@@ -25,12 +25,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 注册路由
+# ????
 from app.api.analysis import router as analysis_router
 from app.api.webhook import router as webhook_router
+from app.api.admin import router as admin_router
 
 app.include_router(analysis_router)
 app.include_router(webhook_router)
+app.include_router(admin_router)
 
 
 @app.get("/api/health")

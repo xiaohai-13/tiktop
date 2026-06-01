@@ -1,12 +1,12 @@
-# ============================================================
+﻿# ============================================================
 # 账号分析服务层
 # ============================================================
 import logging
 from app.agents.competitor_agent import CompetitorAgent
+from app.services.report_service import save_report
 
 logger = logging.getLogger(__name__)
 
-# 全局 Agent 实例（单例，复用 LLM 连接）
 _competitor_agent: CompetitorAgent | None = None
 
 
@@ -18,12 +18,14 @@ def get_competitor_agent() -> CompetitorAgent:
 
 
 def analyze_account(username: str) -> dict:
-    """
-    分析单个 TikTok 账号，返回结构化结果
-    """
+    """分析单个 TikTok 账号，自动保存报告"""
     agent = get_competitor_agent()
     try:
         report = agent.analyze(username)
+
+        # 自动保存报告
+        save_report(username, report, report_type="competitor")
+
         return {
             "success": True,
             "username": username,
