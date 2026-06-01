@@ -1,0 +1,33 @@
+﻿# ============================================================
+# TikTok AI 智能运营系统 — 依赖
+# ============================================================
+
+# --- Web 框架 ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+
+# --- Dashboard 界面 ---
+streamlit==1.41.1
+
+# --- AI 框架 (LangChain + DeepSeek) ---
+langchain==0.3.14
+langchain-core>=0.3.34
+langgraph==0.2.61
+langchain-deepseek==0.1.2
+
+# --- 数据采集 ---
+playwright==1.49.1
+
+# --- 数据库 ---
+sqlalchemy==2.0.36
+chromadb==0.5.23
+
+# --- 飞书 SDK ---
+lark-oapi==1.4.9
+
+# --- 工具 ---
+python-dotenv==1.0.1
+pydantic==2.10.4
+httpx==0.28.1
+apscheduler==3.10.4
+python-multipart==0.0.19
