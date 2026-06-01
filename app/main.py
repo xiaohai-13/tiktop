@@ -1,9 +1,15 @@
 ﻿# ============================================================
 # FastAPI 主入口
 # ============================================================
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
+
+logging.basicConfig(
+    level=getattr(logging, settings.LOG_LEVEL.upper(), "INFO"),
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
 
 app = FastAPI(
     title="TikTok AI 智能运营系统",
@@ -11,7 +17,6 @@ app = FastAPI(
     version="0.1.0",
 )
 
-# CORS — 允许 Streamlit Dashboard 跨域请求
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,6 +24,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 注册路由
+from app.api.analysis import router as analysis_router
+app.include_router(analysis_router)
 
 
 @app.get("/api/health")
